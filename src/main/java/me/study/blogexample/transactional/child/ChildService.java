@@ -14,24 +14,36 @@ public class ChildService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void saveWithRequired(Child child) {
+    public void saveWithRequired(Child child, boolean exception) {
         childRepository.save(child);
-    }
-
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void saveWithRequiredAndFailed(Child child) {
-        childRepository.save(child);
-        throw new RuntimeException();
+        if (exception) {
+            throw new RuntimeException();
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveWithRequiredNew(Child child) {
+    public void saveWithRequiredNew(Child child, boolean exception) {
+        childRepository.save(child);
+        if (exception) {
+            throw new RuntimeException();
+        }
+    }
+
+    @Transactional(propagation = Propagation.MANDATORY)
+    public void saveWithMandatory(Child child) {
         childRepository.save(child);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveWithRequiredNewAndFailed(Child child) {
+    @Transactional(propagation = Propagation.NEVER)
+    public void saveWithNever(Child child) {
         childRepository.save(child);
-        throw new RuntimeException();
+    }
+
+    @Transactional(propagation = Propagation.NESTED)
+    public void saveWithNested(Child child, boolean exception) {
+        childRepository.save(child);
+        if (exception) {
+            throw new RuntimeException();
+        }
     }
 }

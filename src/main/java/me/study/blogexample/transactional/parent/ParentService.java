@@ -21,20 +21,20 @@ public class ParentService {
     @Transactional
     public void saveWithRequiredAndParentFailed(Parent parent, Child child) {
         parentRepository.save(parent);
-        childService.saveWithRequired(child);
+        childService.saveWithRequired(child, false);
         throw new RuntimeException();
     }
 
     @Transactional
     public void saveWithRequiredAndChildFailed(Parent parent, Child child) {
         parentRepository.save(parent);
-        childService.saveWithRequiredAndFailed(child);
+        childService.saveWithRequired(child, true);
     }
 
     @Transactional
     public void saveWithRequiredNewAndParentFailed(Parent parent, Child child) {
         parentRepository.save(parent);
-        childService.saveWithRequiredNew(child);
+        childService.saveWithRequiredNew(child, false);
         throw new RuntimeException();
     }
 
@@ -42,7 +42,35 @@ public class ParentService {
     public void saveWithRequiredNewAndChildFailed(Parent parent, Child child) {
         parentRepository.save(parent);
         try {
-            childService.saveWithRequiredNewAndFailed(child);
+            childService.saveWithRequiredNew(child, true);
+        } catch (Exception e) {
+            log.warn("자식 호출 실패");
+        }
+    }
+
+    public void saveWithMandatoryAndNoTransaction(Parent parent, Child child) {
+        parentRepository.save(parent);
+        childService.saveWithMandatory(child);
+    }
+
+    @Transactional
+    public void saveWithNeverAndTransaction(Parent parent, Child child) {
+        parentRepository.save(parent);
+        childService.saveWithNever(child);
+    }
+
+    @Transactional
+    public void saveWithNestedAndParentFailed(Parent parent, Child child) {
+        parentRepository.save(parent);
+        childService.saveWithNested(child, false);
+        throw new RuntimeException();
+    }
+
+    @Transactional
+    public void saveWithNestedAndChildFailed(Parent parent, Child child) {
+        parentRepository.save(parent);
+        try {
+            childService.saveWithNested(child, true);
         } catch (Exception e) {
             log.warn("자식 호출 실패");
         }
