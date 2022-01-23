@@ -8,6 +8,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.IllegalTransactionStateException;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -46,7 +47,7 @@ class TransactionalPropagationTest {
     }
 
     @Test
-    @DisplayName("propagation이 REQUIRED, 부모가 문제인 경우 둘다 롤백된다.")
+    @DisplayName("propagation이 REQUIRED, 부모가 문제인 경우 둘 다 Rollback 된다.")
     void saveWithRequiredAndParentFailed() {
         // when
         assertThatExceptionOfType(RuntimeException.class)
@@ -58,7 +59,7 @@ class TransactionalPropagationTest {
     }
 
     @Test
-    @DisplayName("propagation이 REQUIRED, 자식이 문제인 경우 둘다 롤백된다.")
+    @DisplayName("propagation이 REQUIRED, 자식이 문제인 경우 둘 다 Rollback 된다.")
     void saveWithRequiredAndChildFailed() {
         // when
         assertThatExceptionOfType(RuntimeException.class)
@@ -70,7 +71,7 @@ class TransactionalPropagationTest {
     }
 
     @Test
-    @DisplayName("propagation이 REQUIRED_NEW, 부모가 문제인 경우 부모만 롤백된다.")
+    @DisplayName("propagation이 REQUIRED_NEW, 부모가 문제인 경우 부모만 Rollback 된다.")
     void saveWithRequiredNewAndParentFailed() {
         // when
         assertThatExceptionOfType(RuntimeException.class)
@@ -82,10 +83,57 @@ class TransactionalPropagationTest {
     }
 
     @Test
-    @DisplayName("propagation이 REQUIRED_NEW, 자식이 문제인 경우 자식만 롤백된다.")
+    @DisplayName("propagation이 REQUIRED_NEW, 자식이 문제인 경우 자식만 Rollback 된다.")
     void saveWithRequiredNewAndChildFailed() {
         // when
         parentService.saveWithRequiredNewAndChildFailed(parent, child);
+
+        // then
+        assertThat(parentRepository.count()).isOne();
+        assertThat(childRepository.count()).isZero();
+    }
+
+    @Test
+    @DisplayName("propagation이 MANDATORY, 이미 시작한 트랜잭션이 없으면 예외를 발생한다.")
+    void saveWithMandatoryAndNoTransaction() {
+        // when
+        assertThatExceptionOfType(IllegalTransactionStateException.class)
+                .isThrownBy(() -> parentService.saveWithMandatoryAndNoTransaction(parent, child));
+
+        // then
+        assertThat(parentRepository.count()).isOne();
+        assertThat(childRepository.count()).isZero();
+    }
+
+    @Test
+    @DisplayName("propagation이 NEVER, 이미 시작한 트랜잭션이 있으면 예외를 발생한다.")
+    void saveWithNeverAndTransaction() {
+        // when
+        assertThatExceptionOfType(IllegalTransactionStateException.class)
+                .isThrownBy(() -> parentService.saveWithNeverAndTransaction(parent, child));
+
+        // then
+        assertThat(parentRepository.count()).isZero();
+        assertThat(childRepository.count()).isZero();
+    }
+
+    @Test
+    @DisplayName("propagation이 NESTED, 부모가 문제인 경우 둘 다 Rollback 된다.")
+    void saveWithNestedNewAndParentFailed() {
+        // when
+        assertThatExceptionOfType(RuntimeException.class)
+                .isThrownBy(() -> parentService.saveWithNestedAndParentFailed(parent, child));
+
+        // then
+        assertThat(parentRepository.count()).isZero();
+        assertThat(childRepository.count()).isZero();
+    }
+
+    @Test
+    @DisplayName("propagation이 NESTED, 자식이 문제인 경우 자식만 Rollback 된다.")
+    void saveWithNestedNewAndChildFailed() {
+        // when
+        parentService.saveWithNestedAndChildFailed(parent, child);
 
         // then
         assertThat(parentRepository.count()).isOne();
