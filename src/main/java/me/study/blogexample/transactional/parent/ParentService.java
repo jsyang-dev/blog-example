@@ -32,17 +32,17 @@ public class ParentService {
     }
 
     @Transactional
-    public void saveWithRequiredNewAndParentFailed(Parent parent, Child child) {
+    public void saveWithRequiresNewAndParentFailed(Parent parent, Child child) {
         parentRepository.save(parent);
-        childService.saveWithRequiredNew(child, false);
+        childService.saveWithRequiresNew(child, false);
         throw new RuntimeException();
     }
 
     @Transactional
-    public void saveWithRequiredNewAndChildFailed(Parent parent, Child child) {
+    public void saveWithRequiresNewAndChildFailed(Parent parent, Child child) {
         parentRepository.save(parent);
         try {
-            childService.saveWithRequiredNew(child, true);
+            childService.saveWithRequiresNew(child, true);
         } catch (Exception e) {
             log.warn("자식 호출 실패");
         }
