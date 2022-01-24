@@ -1,7 +1,10 @@
-package me.study.blogexample.transactional.parent;
+package me.study.blogexample.transactional;
 
 import me.study.blogexample.transactional.child.Child;
 import me.study.blogexample.transactional.child.ChildRepository;
+import me.study.blogexample.transactional.parent.Parent;
+import me.study.blogexample.transactional.parent.ParentRepository;
+import me.study.blogexample.transactional.parent.ParentService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -71,11 +74,11 @@ class TransactionalPropagationTest {
     }
 
     @Test
-    @DisplayName("propagation이 REQUIRED_NEW, 부모가 문제인 경우 부모만 Rollback 된다.")
-    void saveWithRequiredNewAndParentFailed() {
+    @DisplayName("propagation이 REQUIRES_NEW, 부모가 문제인 경우 부모만 Rollback 된다.")
+    void saveWithRequiresNewAndParentFailed() {
         // when
         assertThatExceptionOfType(RuntimeException.class)
-                .isThrownBy(() -> parentService.saveWithRequiredNewAndParentFailed(parent, child));
+                .isThrownBy(() -> parentService.saveWithRequiresNewAndParentFailed(parent, child));
 
         // then
         assertThat(parentRepository.count()).isZero();
@@ -83,10 +86,10 @@ class TransactionalPropagationTest {
     }
 
     @Test
-    @DisplayName("propagation이 REQUIRED_NEW, 자식이 문제인 경우 자식만 Rollback 된다.")
-    void saveWithRequiredNewAndChildFailed() {
+    @DisplayName("propagation이 REQUIRES_NEW, 자식이 문제인 경우 자식만 Rollback 된다.")
+    void saveWithRequiresNewAndChildFailed() {
         // when
-        parentService.saveWithRequiredNewAndChildFailed(parent, child);
+        parentService.saveWithRequiresNewAndChildFailed(parent, child);
 
         // then
         assertThat(parentRepository.count()).isOne();

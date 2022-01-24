@@ -22,7 +22,7 @@ public class ChildService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveWithRequiredNew(Child child, boolean exception) {
+    public void saveWithRequiresNew(Child child, boolean exception) {
         childRepository.save(child);
         if (exception) {
             throw new RuntimeException();
