@@ -41,11 +41,7 @@ public class ParentService {
     @Transactional
     public void saveWithRequiresNewAndChildFailed(Parent parent, Child child) {
         parentRepository.save(parent);
-        try {
-            childService.saveWithRequiresNew(child, true);
-        } catch (Exception e) {
-            log.warn("자식 호출 실패");
-        }
+        childService.saveWithRequiresNew(child, true);
     }
 
     public void saveWithMandatoryAndNoTransaction(Parent parent, Child child) {
@@ -69,10 +65,6 @@ public class ParentService {
     @Transactional
     public void saveWithNestedAndChildFailed(Parent parent, Child child) {
         parentRepository.save(parent);
-        try {
-            childService.saveWithNested(child, true);
-        } catch (Exception e) {
-            log.warn("자식 호출 실패");
-        }
+        childService.saveWithNested(child, true);
     }
 }

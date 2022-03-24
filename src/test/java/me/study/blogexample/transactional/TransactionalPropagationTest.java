@@ -86,13 +86,16 @@ class TransactionalPropagationTest {
     }
 
     @Test
-    @DisplayName("propagation이 REQUIRES_NEW, 자식이 문제인 경우 자식만 Rollback 된다.")
+    @DisplayName("propagation이 REQUIRES_NEW, 자식이 문제인 경우 둘 다 Rollback 된다.")
     void saveWithRequiresNewAndChildFailed() {
         // when
-        parentService.saveWithRequiresNewAndChildFailed(parent, child);
+        try {
+            parentService.saveWithRequiresNewAndChildFailed(parent, child);
+        } catch (Exception e) {
+        }
 
         // then
-        assertThat(parentRepository.count()).isOne();
+        assertThat(parentRepository.count()).isZero();
         assertThat(childRepository.count()).isZero();
     }
 
@@ -133,13 +136,16 @@ class TransactionalPropagationTest {
     }
 
     @Test
-    @DisplayName("propagation이 NESTED, 자식이 문제인 경우 자식만 Rollback 된다.")
+    @DisplayName("propagation이 NESTED, 자식이 문제인 경우 둘 다 Rollback 된다.")
     void saveWithNestedNewAndChildFailed() {
         // when
-        parentService.saveWithNestedAndChildFailed(parent, child);
+        try {
+            parentService.saveWithNestedAndChildFailed(parent, child);
+        } catch (Exception e) {
+        }
 
         // then
-        assertThat(parentRepository.count()).isOne();
+        assertThat(parentRepository.count()).isZero();
         assertThat(childRepository.count()).isZero();
     }
 }
